@@ -1,0 +1,69 @@
+Google  "genes upregulated in cardiomyocytes"
+
+MX Doss 2007 - "murine"
+
+P Li 2003 - we dont want HYPERTROPHIC CM-cytes
+
+M Cui 2018 - 
+
+D Frank 2008 - we arent interested in Stretched CM-cytes gene expression
+
+XQ Xu 2009 - Singapore
+
+J Synnergren  2008  - Sweden
+
+Nomura 2018 - again, these CMcytes are in a state of hypertrophy
+
+mx doss - oh what the heck, its the first hit
+and has 81 citations
+
+CUI p.1..4
+MYH6 (alpha MHC), cardiac troponin T 3 (cTnT3)
+cardiac troponin I (TNNI3)
+GATA4, TBX5 & NKX2.5
+
+XQ XU p.1-8
+NPPA NPPB MYH6 TNNC1
+PLN
+
+Synnergren 1831..1838
+MYH6 MYH7 PLN TNNT2 MYL2 NPPA
+MYL7
+
+MX DOSS: (printed p.1,2,5,6,13,14)
+alpha-MHC, Troponin T, Mef2C, MLC2v
+phospholamban, troponin C
+
+
+
+
+
+
+
+
+#Check that CM-cyte characteristic genes are up-regulated in Emma non-iPS:
+
+#MYH6
+#MLC2v=MYL2
+#PLN
+#NPPA
+
+iPS = b$Condition=='ips'
+ORDER=order(b$Condition)
+iPS = iPS[ORDER]
+Emma2=Emma[ORDER,]
+
+cbind(b[ORDER,][,2:3],iPS)
+
+plot  (log10(1+Emma2[,'ENSG00000197616']),ylim=c(0,6))
+points(iPS*6,col='green')
+points(log10(1+Emma2[,'ENSG00000111245']),col='red')
+points(log10(1+Emma2[,'ENSG00000198523']),col='blue')
+points(log10(1+Emma2[,'ENSG00000175206']),col='orange')
+
+#NANOG and OCT4
+plot  (log10(1+Emma2[,'ENSG00000111704']),ylim=c(0,6))
+points(iPS*6,col='green')
+points(log10(1+Emma2[,'ENSG00000204531']),col='red')
+
+#Sanity check passed with flying colors.

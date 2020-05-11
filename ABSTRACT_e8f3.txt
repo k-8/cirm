@@ -1,0 +1,86 @@
+(may 8 2020)
+
+R 3.6.3
+MXM 1.4.5
+glmnet 3.0-2
+
+Monte data set:
+32800 genes
+55 hypertrophic cardiomyopathy (HCM)
+29 dilated cardiomyopathy (DCM)
+29 control
+iPS -> cardiomyocytes
+# humans = 100
+
+MXM on Emma:  questionable
+
+Google  "hypertrophic cardiomyocyte data"
+=> S Nomura 2018
+GSE 95140 md5=b7cd
+
+Patients are actually DCM!  Oh well
+
+--------------------
+MXM on Nomura:  okay
+--------------------
+a=read.table("C:/users/robertkam/desktop/Nomura_b7cd.txt",header=T,row.names=1)
+dim(a)  #23355 x 559
+
+Dilated = as.integer(substr(colnames(a),1,4)=='DCM_')
+
+cbind(colnames(a)[440:450],Dilated[440:450])
+#looks good
+
+a2 = t(a)
+a2 = log10(1+a2)
+
+#120 seconds, 'fitted probability 0 or 1'
+o=MXM::MMPC(Dilated,a2,test='testIndLogistic',ncores=2)
+
+colnames(a2)[attr(o,'selectedVars')]
+#[1] "ADAMTS9"  "ANKRD1"   "MTRNR2L1"
+
+
+
+
+
+
+
+
+Nomura =x=>    Emma
+       (Lasso)
+
+Note Nomura is pure cardiomyocytes:  "isolated rod shaped cells"
+Emma's is also pure cardiomyocytes.
+
+DECIDE:  Is there is a material difference between
+         *ipsc-derived* cardiomyocytes and cardiomyocytes obtained from
+         a heart?
+
+Google  "dilated cardiomyopathy cardiomyocyte rna seq"
+
+ME Sweet 2018 - 37 DCM patients
+
+M Heinig 2017 - 97 DCM patients
+
+There are no iPSC->cardiomyocytes w/DCM data sets.
+
+Heinig (public EGAS) data is .bam and .fq (raw base pairs)
+Go with Sweet.
+
+Sweet =x=>    Nomura
+      (Lasso)
+
+Sweet =>      Nomura
+      (DEGs)
+
+Lasso is not an automatic solution to finding a set of ~15 predictor
+genes to distinguish DCM vs. Control etc.
+
+Sweet =x=>    Emma
+      (DEGs)
+
+general cardiomyocyte DEGs => Emma.
+
+PROVED:  ipsc-derived cardiomyocytes are distinct from those
+         from a heart.

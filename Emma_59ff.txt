@@ -1,0 +1,87 @@
+#--------------------------------
+#Sweet's DEGs transfer to nomura.
+#--------------------------------
+
+#Addt'l file 4 md5=424a, Table S3a
+#sort by Fold Change (FC)
+
+plot  (1:559,log10(1+a['NPPA',]))
+points(dilate*3,col='green')
+points(1:559,log10(1+a['TNNI1',]),col='red')
+points(1:559,log10(1+a['NPPB',]),col='blue')
+points(1:559,log10(1+a['PI16',]),col='orange')
+points(1:559,log10(1+a['FMOD',]),col='purple')
+
+#Clear showing the trend
+
+plot  (smooth.spline(1:559,log10(1+a['SERPINA3',])),pch='.',ylim=c(0,1))
+points(dilate,col='green')
+points(smooth.spline(1:559,log10(1+a['DHRS7C',])),col='red',pch='.')
+points(smooth.spline(1:559,log10(1+a['SPP1',])),col='blue')
+points(smooth.spline(1:559,log10(1+a['PLA2G2A',])),col='orange')
+points(smooth.spline(1:559,log10(1+a['HOPX',])),col='purple')
+points(smooth.spline(1:559,log10(1+a['LSAMP',])),col='brown')
+
+#4 out of 6 show the proper down-regulated trend.
+
+
+
+
+
+
+
+#---------------------------------
+#But they do not transfer to emma.
+#---------------------------------
+
+Emma=read.csv("C:/users/robertkam/desktop/fb6c.csv",header=TRUE,row.names=1)
+Emma=t(Emma)
+
+b = read.csv("C:/users/robertkam/desktop/sw11SampleDataR_0f0a.csv")
+
+dim(Emma) #307 x 32800
+dim(b)    #307 x 12
+
+emit=rep(0,307)
+for(i in 1:307)
+{
+if(b$Condition[i]=='dmso')
+{
+if(b$Disease[i]=='Healthy Control'
+|| b$Disease[i]=='DCM')            emit[i]=1;
+}
+}
+sum(emit)   #58
+
+Emma2 = Emma[which(emit==1),]
+b58   = b   [which(emit==1),]
+dim(Emma2)  #58 x 32800
+dim(b58)    #58 x 12
+
+Dilate2 = b58$Disease=='DCM'
+
+cbind(b58[,2:4],as.integer(Dilate2))
+#looks good
+
+B = order(b58$Disease)
+
+Dilate2 = Dilate2[B]
+Emma2   = Emma2  [B,]
+
+par(mfrow=c(1,2))
+
+plot  (smooth.spline(log10(1+Emma2[,'ENSG00000175206'])),ylim=c(0,6))
+points(Dilate2*6,col='green')
+points(smooth.spline(log10(1+Emma2[,'ENSG00000159173'])),col='red')
+points(smooth.spline(log10(1+Emma2[,'ENSG00000120937'])),col='blue')
+points(smooth.spline(log10(1+Emma2[,'ENSG00000164530'])),col='orange')
+points(smooth.spline(log10(1+Emma2[,'ENSG00000122176'])),col='purple')
+
+plot  (smooth.spline(log10(1+Emma2[,'ENSG00000196136'])),ylim=c(0,6))
+points(Dilate2*6,col='green')
+points(smooth.spline(log10(1+Emma2[,'ENSG00000184544'])),col='red')
+points(smooth.spline(log10(1+Emma2[,'ENSG00000118785'])),col='blue')
+points(smooth.spline(log10(1+Emma2[,'ENSG00000188257'])),col='orange')
+points(smooth.spline(log10(1+Emma2[,'ENSG00000171476'])),col='purple')
+
+dev.print(bmp,filename="C:/users/robertkam/desktop/f04b.bmp",width=1000,height=500)

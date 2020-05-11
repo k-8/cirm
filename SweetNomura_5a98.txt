@@ -1,0 +1,107 @@
+#-----------------
+#Sweet =x=> Nomura
+#-----------------
+
+Sweet = read.table("C:/users/robertkam/desktop/sweet_20d1.txt",header=T)
+dim(Sweet)  #57974 x 66
+
+a=read.table("C:/users/robertkam/desktop/Nomura_b7cd.txt",header=T,row.names=1)
+dim(a)  #23355 x 559
+
+
+
+
+
+TABLE = table(Sweet[,2])  #which guys appear more than once
+TABLE = TABLE[TABLE==1]   #restrict to singlets
+
+Sweet2 = Sweet[Sweet[,2] %in% names(TABLE),]
+
+dim(Sweet2)  #55471 x 66
+
+rownames(Sweet2) = Sweet2[,2]
+Sweet2 = Sweet2[, -1:-2]  #remove "Ensg" and "Symbol" columns
+
+dim(Sweet2)  #55471 x 64
+
+which(rownames(Sweet2)=='1-Mar')  #(null)
+which(Sweet[,2]=='1-Mar')         #8790 16519
+
+#Intersection
+Sweet2 = Sweet2[rownames(Sweet2) %in% rownames(a)      , ]
+a2     = a     [rownames(a)      %in% rownames(Sweet2) , ]
+
+dim(Sweet2)  #20545 x 64
+
+Sweet2 = Sweet2[order(rownames(Sweet2)),] #sort
+
+identical(rownames(Sweet2),rownames(a2))  #FALSE
+
+a2 = a2[order(rownames(a2)),]             #sort
+
+identical(rownames(Sweet2),rownames(a2))  #TRUE
+
+
+
+
+
+Dilated = substr(colnames(Sweet2),1,3)=='DCM'
+
+#glmnet requires col.s=variables
+Sweet2 = t(Sweet2)
+a2     = t(a2)
+
+#You have to log() because otherwise a 419200 value (outlier)
+#will throw your whole regression (the coefficients of all
+#OTHER genes) into the negative stratosphere
+
+#Pre-scale else coef.s from glmnet not interpreble
+
+sum(is.na(Sweet2))  #0
+Sweet2=log10(1+Sweet2)
+sum(is.na(Sweet2))  #0
+Sweet2=scale(Sweet2)
+sum(is.na(Sweet2))  #105920
+105920 / 64  #1655 bad columns
+Sweet2[which(is.na(Sweet2))]=0
+sum(is.na(Sweet2))  #0
+
+range(Sweet2)  #-7.787321 .. 7.875000
+
+fit=glmnet::glmnet(x=Sweet2,y=Dilated,alpha=1,family="binomial",standardize=FALSE)
+
+#s=0.064140 for 75% "coverage"
+
+PREDICT=predict(fit,s=.064,newx=Sweet2,type='response')
+plot(PREDICT)
+points(Dilated,col='green')
+
+#looks appropriate
+
+sum(is.na(a2))  #0
+a2=log10(1+a2)
+sum(is.na(a2))  #0
+a2=scale(a2)
+sum(is.na(a2))  #736762
+736762 / 559  #1318 bad columns
+a2[which(is.na(a2))]=0
+sum(is.na(a2))  #0
+
+range(a2)  #-5.07542 .. 23.60089
+
+dilate = substr(rownames(a2),1,3)=='DCM'
+
+cbind(dilate,rownames(a2))[440:450,]
+#looks good
+
+
+
+
+PREDICT=predict(fit,s=.064,newx=a2,type='response')
+plot(PREDICT,pch='.')
+points(dilate,col='green')
+points(smooth.spline(PREDICT))
+
+#did not transfer
+
+dev.print(bmp,filename="C:/users/robertkam/desktop/4ece.bmp",width=500,height=500)
