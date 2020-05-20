@@ -1,0 +1,12 @@
+Use Emma's genes to restrict Nomura's  (restrict the set of
+Nomura's genes we apply LASSO to.)  Reason is that say
+A1BG is highly correlated with A1CF.  But Emma's set doesnt
+have A1BG.  So, looking at Nomura's data which has both A1BG
+and A1CF, Lasso by bad luck decides to send A1CF coefficient
+to 0 and use A1BG as the representor of the two - returning a
+coefficient of .3 for A1BG and 0 for A1CF.
+Then when we apply the model to Emma's data with predict(),
+Emma's data only has A1CF.  It says "Okay according to the best
+model we could get, A1CF is irrelevant, so.."  which is really
+a bad conclusion since Emma's data DOES have basically all the
+information provided by A1BG (in the form of A1CF)
